@@ -6,9 +6,7 @@
 * Change the List index with 'X' and then Display board 
 * Input Position from Player 2
 * Change the List index with 'O' and then Display board
-
 """
-
 
 def player_selection():
     player_list = []
@@ -46,9 +44,9 @@ def confirmation():
 
         
 def player_assignment(player_list):
-    player_map = {player_list[0]:'X', player_list[1]:'O'}
-    print(f'{player_list[0]} is {player_map.get(player_list[0])}')
-    print(f'{player_list[1]} is {player_map.get(player_list[1])}')
+    player_map = {'X':player_list[0], 'O':player_list[1]}
+    print(f'{player_list[0]} is {list(player_map.keys())[0]}')
+    print(f'{player_list[1]} is {list(player_map.keys())[1]}')
     return player_map
     
     
@@ -61,59 +59,137 @@ def display_board(board):
 
 
 def start(board, player_map):
-    display_board(board)
-    while True:
-        board = player_1_turn(board, player_map)
-        print(board)
-        board = player_2_turn(board, player_map)
-        print(board)
-        break
-        # player 1 Turn
-        # Board Refresh
-        # Player 2 Turn 
-        # Board Refresh   
-        # If counter >= 5 Check Winner
-   
+    board_dict={}
+    for i in range(9):
+        board_dict.update({i: board[i]})
+    display_board(list(board_dict.values()))
+    winner_decided = False
+    winner_who  = ''
+    counter = 1
+    while counter <= 9:
+        board_dict = player_1_turn(board_dict, player_map)
+        if counter >= 5:
+            win_tuple = check_winner(board_dict)
+            winner_decided = win_tuple[0]
+            winner_who = win_tuple[1]
+            if winner_decided:
+                break
+        counter = counter + 1
+        board_dict = player_2_turn(board_dict, player_map)
+        counter = counter + 1
+        if counter >= 5:
+            win_tuple = check_winner(board_dict)
+            winner_decided = win_tuple[0]
+            winner_who = win_tuple[1]
+            if winner_decided:
+                break
+    if winner_decided:
+        print("Congratulations!")
+        print(f'Winner is {player_map.get(winner_who)}')
+    else:
+        print("Match Drawn!")
+  
     
-def player_1_turn(board, player_map):
+def player_1_turn(board_dict, player_map):
     confirm = False
     while not confirm: 
-        print(f'{list(player_map.keys())[0]}\'s turn ')
-        position = get_position()
-        new_board = board[:]
-        new_board[position] = player_map.get(list(player_map.keys())[0])
-        display_board(new_board)
+        print(f'{player_map.get(list(player_map.keys())[0])}\'s turn ')
+        position = get_position(board_dict)
+        new_board = board_dict.copy()
+        new_board[position] = list(player_map.keys())[0]
+        display_board(list(new_board.values()))
         confirm = confirmation()
         if confirm:
             return new_board
     
 
-def player_2_turn(board, player_map):
+def player_2_turn(board_dict, player_map):
     confirm = False
     while not confirm:
-        print(f'{list(player_map.keys())[1]}\'s turn ')
-        position = get_position()
-        new_board = board[:]
-        new_board[position] = player_map.get(list(player_map.keys())[1])
-        display_board(new_board)
+        print(f'{player_map.get(list(player_map.keys())[1])}\'s turn ')
+        position = get_position(board_dict)
+        new_board = board_dict.copy()
+        new_board[position] = list(player_map.keys())[1]
+        display_board(list(new_board.values()))
         confirm = confirmation()
         if confirm:
             return new_board
 
 
-def get_position():
+def get_position(board_dict):
     # Get Positions from User 
-    position = -1
-    while position not in range(9):
+    position = 'a'
+    position_pass = False
+    while (position not in range(9)) or  position_pass == False:
         position = input("Please enter a number (0-8): ")
-        if position.isdigit():
+        if position.isdigit(): 
             position = int(position)
+            if board_dict[position] == ' ':
+                position_pass = True
+            else:
+                print("Position already taken! Try Again!")
         else:
             print("Not a number! Try Again!")
     return position
 
 
+def check_winner(board_dict):
+    winner = False
+    who_winner = ' '
+    if board_dict[0] == board_dict[1] == board_dict[2] == 'X':
+        who_winner = 'X'
+        winner = True
+    elif board_dict[0] == board_dict[1] == board_dict[2] == 'O':
+        who_winner = 'O'
+        winner = True
+    elif board_dict[3] == board_dict[4] == board_dict[5] == 'X':
+        who_winner = 'X'
+        winner = True
+    elif board_dict[3] == board_dict[4] == board_dict[5] == 'O':
+        who_winner = 'O'
+        winner = True
+    elif board_dict[6] == board_dict[7] == board_dict[8] == 'X':
+        who_winner = 'X'
+        winner = True
+    elif board_dict[6] == board_dict[7] == board_dict[8] == 'O':
+        who_winner = 'O'
+        winner = True
+    elif board_dict[0] == board_dict[3] == board_dict[6] == 'X':
+        who_winner = 'X'
+        winner = True
+    elif board_dict[0] == board_dict[3] == board_dict[6] == 'O':
+        who_winner = 'O'
+        winner = True
+    elif board_dict[1] == board_dict[4] == board_dict[7] == 'X':
+        who_winner = 'X'
+        winner = True
+    elif board_dict[1] == board_dict[4] == board_dict[7] == 'O':
+        who_winner = 'O'
+        winner = True
+    elif board_dict[2] == board_dict[5] == board_dict[8] == 'X':
+        who_winner = 'X'
+        winner = True
+    elif board_dict[2] == board_dict[5] == board_dict[8] == 'O':
+        who_winner = 'O'
+        winner = True
+    elif board_dict[0] == board_dict[4] == board_dict[8] == 'X':
+        who_winner = 'X'
+        winner = True
+    elif board_dict[0] == board_dict[4] == board_dict[8] == 'O':
+        who_winner = 'O'
+        winner = True
+    elif board_dict[2] == board_dict[4] == board_dict[6] == 'X':
+        print("winner")
+        who_winner = 'X'
+        winner = True
+    elif board_dict[2] == board_dict[4] == board_dict[6] == 'O':
+        who_winner = 'O'
+        winner = True
+    else:
+        winner = False
+    return (winner, who_winner)
 
+  
 # Select Players
 player_list = player_selection()
 
